@@ -21,7 +21,7 @@
             @include('layouts.navigation')
 
             <!-- Page Content -->
-            <main>
+            <main class="pt-24 sm:pt-0">
                 {{ $slot }}
             </main>
         </div>
