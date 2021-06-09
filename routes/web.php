@@ -18,10 +18,13 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [DefaultController::class, 'index'])->name('default');
 
 Route::post('/messages', [MessageController::class, 'store'])
-    ->middleware('can:store,App\Models\Message');
+    ->middleware('can:store,App\Models\Message')
+    ->name('messages.store');
 Route::post('/messages/{message}', [MessageController::class, 'update'])
-    ->middleware('can:update,message');
+    ->middleware('can:update,message')
+    ->name('messages.update');
 Route::delete('/messages/{message}', [MessageController::class, 'destroy'])
-    ->middleware('can:destroy,message');
+    ->middleware('can:destroy,message')
+    ->name('messages.destroy');
 
 require __DIR__ . '/auth.php';
