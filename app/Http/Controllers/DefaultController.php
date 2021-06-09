@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Models\Message;
 
 class DefaultController extends Controller
 {
     public function index()
     {
-        return view('default.index');
+        $messages = Message::orderBy('id')->cursorPaginate(10);
+
+        return view('default.index', compact('messages'));
     }
 }
