@@ -19,6 +19,11 @@ class MessageController extends Controller
         return redirect('/');
     }
 
+    public function edit(Message $message)
+    {
+        return view('message.edit', compact('message'));
+    }
+
     public function update(UpdateRequest $request, Message $message)
     {
         $message->update($request->validated());

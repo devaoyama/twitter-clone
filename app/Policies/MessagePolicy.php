@@ -26,12 +26,17 @@ class MessagePolicy
         return Auth::check();
     }
 
-    public function update(User $user, Message $message)
+    public function edit(User $user, Message $message): bool
     {
         return $user->id === $message->user_id;
     }
 
-    public function destroy(User $user, Message $message)
+    public function update(User $user, Message $message): bool
+    {
+        return $user->id === $message->user_id;
+    }
+
+    public function destroy(User $user, Message $message): bool
     {
         return $user->id === $message->user_id;
     }

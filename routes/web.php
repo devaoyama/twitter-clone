@@ -20,6 +20,9 @@ Route::get('/', [DefaultController::class, 'index'])->name('default');
 Route::post('/messages', [MessageController::class, 'store'])
     ->middleware('can:store,App\Models\Message')
     ->name('messages.store');
+Route::get('/messages/{message}', [MessageController::class, 'edit'])
+    ->middleware('can:edit,message')
+    ->name('messages.edit');
 Route::post('/messages/{message}', [MessageController::class, 'update'])
     ->middleware('can:update,message')
     ->name('messages.update');
