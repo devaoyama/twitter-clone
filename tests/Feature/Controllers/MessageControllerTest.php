@@ -49,6 +49,32 @@ class MessageControllerTest extends TestCase
         $response->assertStatus(403);
     }
 
+    public function test_message_edit_screen_can_be_rendered()
+    {
+        $message = Message::factory()->create();
+        $response = $this->actingAs($message->user)->get('/messages/' . $message->id);
+
+        $response->assertViewHas('message', $message);
+        $response->assertSuccessful();
+    }
+
+    public function test_message_edit_screen_can_not_be_rendered_if_unauthorized()
+    {
+        $message = Message::factory()->create();
+        $user = User::factory()->create();
+        $response = $this->actingAs($user)->get('/messages/' . $message->id);
+
+        $response->assertStatus(403);
+    }
+
+    public function test_message_edit_screen_can_not_be_rendered_if_message_not_found()
+    {
+        $user = User::factory()->create();
+        $response = $this->actingAs($user)->get('/messages/100');
+
+        $response->assertStatus(404);
+    }
+
     public function test_message_can_be_updated()
     {
         $message = Message::factory()->create();
