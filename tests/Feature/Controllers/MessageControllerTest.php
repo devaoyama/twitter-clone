@@ -37,7 +37,7 @@ class MessageControllerTest extends TestCase
             'content' => $this->faker->realTextBetween(),
         ]);
 
-        $response->assertSessionHasErrors();
+        $response->assertSessionHasErrors(['content' => 'メッセージは、140文字以下にしてください。']);
     }
 
     public function test_message_can_not_be_created_if_guest()
@@ -102,7 +102,7 @@ class MessageControllerTest extends TestCase
         $updatedMessage = Message::find($message->id);
         $this->assertNotEquals('updated content', $updatedMessage->content);
 
-        $response->assertSessionHasErrors();
+        $response->assertSessionHasErrors(['content' => 'メッセージは、140文字以下にしてください。']);
     }
 
     public function test_message_can_not_be_updated_if_unauthorized()
