@@ -30,6 +30,16 @@ class MessageControllerTest extends TestCase
         $response->assertRedirect(RouteServiceProvider::HOME);
     }
 
+    public function test_message_can_not_be_created_if_content_empty()
+    {
+        $user = User::factory()->create();
+        $response = $this->actingAs($user)->post('/messages', [
+            'content' => '',
+        ]);
+
+        $response->assertSessionHasErrors(['content' => 'メッセージは、必ず指定してください。']);
+    }
+
     public function test_message_can_not_be_created_if_content_long()
     {
         $user = User::factory()->create();
@@ -89,6 +99,20 @@ class MessageControllerTest extends TestCase
         // レスポンスが正しいかどうか
         $response->assertStatus(302);
         $response->assertRedirect(RouteServiceProvider::HOME);
+    }
+
+    public function test_message_can_not_be_updated_if_content_empty()
+    {
+        $message = Message::factory()->create();
+        $response = $this->actingAs($message->user)->post('/messages/' . $message->id, [
+            'content' => '',
+        ]);
+
+        // Messageが更新されていないかどうか
+        $updatedMessage = Message::find($message->id);
+        $this->assertNotEquals('updated content', $updatedMessage->content);
+
+        $response->assertSessionHasErrors(['content' => 'メッセージは、必ず指定してください。']);
     }
 
     public function test_message_can_not_be_updated_if_content_long()
