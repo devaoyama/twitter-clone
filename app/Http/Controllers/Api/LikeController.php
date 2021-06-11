@@ -13,13 +13,13 @@ class LikeController extends Controller
     {
         $user = Auth::user();
         $user->likedMessages()->attach($request->message_id);
-        return 1;
+        return response()->json(1);
     }
 
     public function destroy(DestroyRequest $request)
     {
         $user = Auth::user();
         $user->likedMessages()->detach($request->message_id);
-        return 1;
+        return response()->json(1);
     }
 }
