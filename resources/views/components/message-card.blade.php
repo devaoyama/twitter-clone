@@ -37,12 +37,47 @@
         @endif
     </div>
     <p class="px-10 pt-8 py-6 text-lg text-gray-darkest leading-relaxed">{!! nl2br(e($message->content)) !!}</p>
-    <p class="pb-4 flex justify-end">
-        <button class="focus:outline-none" type="button">
-            <span class="pr-2 text-xl">
-                いいね
-            </span>
-        </button>
-        <span class="pr-10 text-lg text-gray">3</span>
-    </p>
+    @auth
+        <p x-data="{ isLiked: @json($message->isLiked(Auth::user())), count: @json($message->likedUsers()->count()) }" class="pb-4 flex justify-end items-center">
+            <template x-if="isLiked">
+                <button
+                    class="focus:outline-none"
+                    type="button"
+                    @click="requestLike({ isLiked, messageId: @json($message->id) }).then(() => {
+                        isLiked = false;
+                        count--;
+                });"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="red" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                </button>
+            </template>
+            <template x-if="!isLiked">
+                <button
+                    class="focus:outline-none"
+                    type="button"
+                    @click="requestLike({ isLiked, messageId: @json($message->id) }).then(() => {
+                        isLiked = true;
+                        count++;
+                });"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                </button>
+            </template>
+            <span class="pr-10 text-lg text-gray" x-text="count"></span>
+        </p>
+    @else
+        <p class="pb-4 flex justify-end items-center">
+            <a href="{{ route('login') }}" class="block">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                </svg>
+            </a>
+            <span class="pr-10 text-lg text-gray">{{ $message->likedUsers()->count() }}</span>
+        </p>
+    @endauth
+
 </div>

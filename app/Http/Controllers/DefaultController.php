@@ -8,7 +8,7 @@ class DefaultController extends Controller
 {
     public function index()
     {
-        $messages = Message::orderBy('id', 'DESC')->with('user')->cursorPaginate(10);
+        $messages = Message::orderBy('id', 'DESC')->with('user', 'likedUsers')->cursorPaginate(10);
 
         return view('default.index', compact('messages'));
     }

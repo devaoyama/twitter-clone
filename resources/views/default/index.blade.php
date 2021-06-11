@@ -11,3 +11,24 @@
         </div>
     </div>
 </x-app-layout>
+
+<script>
+    const requestLike = ({ isLiked, messageId }) => {
+        if (!isLiked) {
+            return fetch('/api/likes', {
+                method: 'post',
+                headers: {
+                    'Content-Type': 'application/json; charset=utf-8',
+                },
+                body: JSON.stringify({ message_id: messageId }),
+            });
+        }
+        return fetch('/api/likes', {
+            method: 'delete',
+            headers: {
+                'Content-Type': 'application/json; charset=utf-8',
+            },
+            body: JSON.stringify({ message_id: messageId }),
+        });
+    }
+</script>
