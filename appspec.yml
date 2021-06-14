@@ -3,6 +3,10 @@ os: linux
 files:
   - source: /
     destination: /var/www/twitter-clone
+permissions:
+  - object: /var/www/twitter-clone
+    pattern: "**"
+    owner: nginx
 hooks:
   AfterInstall:
     - location: scripts/deploy.sh
