@@ -1,6 +1,7 @@
 #!/bin/sh
 
 chown ec2-user /var/www/twitter-clone
+cd /var/www/twitter-clone
 composer install --optimize-autoloader --no-dev
 npm install
 npm run prod
