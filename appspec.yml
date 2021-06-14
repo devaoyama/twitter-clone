@@ -7,9 +7,6 @@ permissions:
   - object: /var/www/twitter-clone
     patter: "**"
     owner: ec2-user
-    type:
-      - file
-      - directory
 hooks:
   AfterInstall:
     - location: scripts/deploy.sh
