@@ -6,7 +6,7 @@ files:
 permissions:
   - object: /var/www/twitter-clone
     pattern: "**"
-    owner: nginx
+    owner: ec2-user
 hooks:
   AfterInstall:
     - location: scripts/deploy.sh
