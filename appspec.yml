@@ -1,0 +1,14 @@
+version: 0.0
+os: linux
+files:
+  - source: /
+    destination: /var/www/twitter-clone
+permissions:
+  - object: /var/www/twitter-clone
+    patter: "**"
+    owner: ec2-user
+hooks:
+  AfterInstall:
+    - location: scripts/deploy.sh
+      timeout: 180
+      runas: root
