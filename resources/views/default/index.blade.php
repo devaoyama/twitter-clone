@@ -1,10 +1,14 @@
 <x-app-layout>
     <div class="relative min-h-screen bg-gray-100 dark:bg-gray-900 sm:pt-24 pb-10">
         <div class="max-w-6xl mx-auto sm:px-6 lg:px-8">
-            @auth
-                <x-message-create-form :content="old('content')" />
-            @endauth
             <div x-data="infiniteScroll()" x-init="init()">
+                <template x-if="user !== null">
+                    <div>
+                        <x-message-create-form />
+                        <hr>
+                    </div>
+                </template>
+
                 <x-message-cards />
 
                 <div class="bg-white h-64 flex text-pink-600 items-center justify-center mx-3 my-5 rounded-lg shadow-md" id="infinite-scroll-trigger">
@@ -49,6 +53,8 @@
             observer: null,
             isObserverPolyfilled: false,
             items: [],
+            errors: [],
+            newContent: '',
             init(elementId) {
                 const ctx = this
                 this.triggerElement = document.querySelector(elementId ? elementId : '#infinite-scroll-trigger')
@@ -88,8 +94,10 @@
                 this.nextLink = links.next;
                 this.items = this.items.concat(data.map(v => ({
                     ...v,
-                    content: v.content.replace(/\r\n/g, '<br>'),
-                    open: false
+                    tmpContent: v.content,
+                    open: false,
+                    isEditing: false,
+                    errors: [],
                 })));
                 if(this.nextLink === null) {
                     if(this.isObserverPolyfilled) {
@@ -99,6 +107,78 @@
                     }
 
                     this.triggerElement.parentNode.removeChild(this.triggerElement)
+                }
+            },
+            async createItem({ content }) {
+                const response = await fetch('/api/messages', {
+                    method: 'post',
+                    headers: {
+                        'Content-Type': 'application/json; charset=utf-8',
+                    },
+                    body: JSON.stringify({ content }),
+                });
+                if (response.ok) {
+                    const { data } = await response.json();
+                    this.items.unshift({
+                        ...data,
+                        tmpContent: content,
+                        open: false,
+                        isEditing: false,
+                        errors: [],
+                    });
+                    this.newContent = '';
+                    this.errors = [];
+                } else {
+                    if (response.status === 400) {
+                        const { errors } = await response.json();
+                        for (let k in errors) {
+                            this.errors.push(...errors[k]);
+                        }
+                    } else {
+                        alert('予期せぬエラーが発生しましtあ。');
+                    }
+                }
+
+            },
+            cancelEdit(item) {
+                item.content = item.tmpContent;
+                item.isEditing = false;
+                item.errors = [];
+            },
+            async editItem(item) {
+                const response = await fetch(`/api/messages/${item.id}`, {
+                    method: 'put',
+                    headers: {
+                        'Content-Type': 'application/json; charset=utf-8',
+                    },
+                    body: JSON.stringify({ content: item.content }),
+                });
+                if (response.ok) {
+                    const { data } = await response.json();
+                    item.updated_at = data.updated_at;
+                    item.isEdited = true;
+                    item.isEditing = false;
+                    item.tmpContent = item.content;
+                    item.errors = [];
+                } else {
+                    if (response.status === 400) {
+                        const { errors } = await response.json();
+                        for (let k in errors) {
+                            item.errors.push(...errors[k]);
+                        }
+                    } else {
+                        alert('予期せぬエラーが発生しましtあ。');
+                    }
+                }
+            },
+            async deleteItem(messageId) {
+                const response = await fetch(`/api/messages/${messageId}`, {
+                    method: 'delete',
+                });
+                if (response.ok) {
+                    this.items = this.items.filter(item => item.id !== messageId);
+                } else {
+                    alert('削除に失敗しました。もう一度やり直してください。');
                 }
             }
         }
