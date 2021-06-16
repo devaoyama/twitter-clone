@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\LikeController;
+use \App\Http\Controllers\Api\MessageController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -18,6 +19,8 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::get('/messages', [MessageController::class, 'index']);
 
 Route::post('/likes', [LikeController::class, 'store'])
     ->middleware('auth')

@@ -15,9 +15,6 @@ class DefaultControllerTest extends TestCase
         Message::factory(15)->create();
         $response = $this->get('/');
 
-        $messages = Message::orderBy('id', 'DESC')->with('user')->cursorPaginate(10);
-        $response->assertViewHas('messages', $messages);
-
         $response->assertStatus(200);
     }
 }
