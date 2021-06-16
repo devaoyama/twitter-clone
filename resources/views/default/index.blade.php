@@ -62,7 +62,7 @@
 
                     window.alpineInfiniteScroll = {
                         scrollFunc() {
-                            var position = ctx.triggerElement.getBoundingClientRect()
+                            const position = ctx.triggerElement.getBoundingClientRect()
 
                             if(position.top < window.innerHeight && position.bottom >= 0) {
                                 ctx.getItems()
@@ -86,7 +86,11 @@
                 const { data, links } = await response.json();
 
                 this.nextLink = links.next;
-                this.items = this.items.concat(data.map(v => ({ ...v, open: false })));
+                this.items = this.items.concat(data.map(v => ({
+                    ...v,
+                    content: v.content.replace(/\r\n/g, '<br>'),
+                    open: false
+                })));
                 if(this.nextLink === null) {
                     if(this.isObserverPolyfilled) {
                         window.removeEventListener('scroll', window.alpineInfiniteScroll.scrollFunc)

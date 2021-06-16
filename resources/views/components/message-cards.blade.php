@@ -44,7 +44,7 @@
                 </template>
             </div>
         </div>
-        <p class="px-10 pt-8 py-6 text-lg text-gray-darkest leading-relaxed" x-text="item.content"></p>
+        <p class="px-10 pt-8 py-6 text-lg text-gray-darkest leading-relaxed" x-html="item.content"></p>
         <template x-if="user !== null">
             <p class="pb-4 flex justify-end items-center">
                 <template x-if="item.isLiked">
