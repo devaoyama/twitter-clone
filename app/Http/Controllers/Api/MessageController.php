@@ -14,4 +14,9 @@ class MessageController extends Controller
 
         return MessageResource::collection($messages);
     }
+
+    function destroy(Message $message)
+    {
+        return response()->json($message->delete());
+    }
 }
