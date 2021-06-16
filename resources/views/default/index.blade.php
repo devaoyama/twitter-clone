@@ -26,25 +26,6 @@
 <script>
     const user = @json(Auth::user());
 
-    const requestLike = ({ isLiked, messageId }) => {
-        if (!isLiked) {
-            return fetch('/api/likes', {
-                method: 'post',
-                headers: {
-                    'Content-Type': 'application/json; charset=utf-8',
-                },
-                body: JSON.stringify({ message_id: messageId }),
-            });
-        }
-        return fetch('/api/likes', {
-            method: 'delete',
-            headers: {
-                'Content-Type': 'application/json; charset=utf-8',
-            },
-            body: JSON.stringify({ message_id: messageId }),
-        });
-    }
-
     function infiniteScroll() {
         return {
             triggerElement: null,
@@ -83,62 +64,52 @@
                             ctx.getItems()
                         }
                     }, { threshold: [0] })
-
                     this.observer.observe(this.triggerElement)
                 }
             },
             async getItems() {
-                const response = await fetch(this.nextLink);
-                const { data, links } = await response.json();
-
-                this.nextLink = links.next;
-                this.items = this.items.concat(data.map(v => ({
-                    ...v,
-                    tmpContent: v.content,
-                    open: false,
-                    isEditing: false,
-                    errors: [],
-                })));
-                if(this.nextLink === null) {
-                    if(this.isObserverPolyfilled) {
-                        window.removeEventListener('scroll', window.alpineInfiniteScroll.scrollFunc)
-                    } else {
-                        this.observer.unobserve(this.triggerElement)
-                    }
-
-                    this.triggerElement.parentNode.removeChild(this.triggerElement)
-                }
+                await fetchMessage({
+                    link: this.nextLink,
+                    onFetchMessage: ({ data, links }) => {
+                        this.nextLink = links.next;
+                        this.items = this.items.concat(data.map(v => ({
+                            ...v,
+                            tmpContent: v.content,
+                            open: false,
+                            isEditing: false,
+                            errors: [],
+                        })));
+                        if (this.nextLink === null) {
+                            if (this.isObserverPolyfilled) {
+                                window.removeEventListener('scroll', window.alpineInfiniteScroll.scrollFunc)
+                            } else {
+                                this.observer.unobserve(this.triggerElement)
+                            }
+                            this.triggerElement.parentNode.removeChild(this.triggerElement)
+                        }
+                    },
+                });
             },
             async createItem({ content }) {
-                const response = await fetch('/api/messages', {
-                    method: 'post',
-                    headers: {
-                        'Content-Type': 'application/json; charset=utf-8',
+                await storeMessage({
+                    content,
+                    onStoreMessage: (data) => {
+                        this.items.unshift({
+                            ...data,
+                            tmpContent: content,
+                            open: false,
+                            isEditing: false,
+                            errors: [],
+                        });
+                        this.newContent = '';
+                        this.errors = [];
                     },
-                    body: JSON.stringify({ content }),
-                });
-                if (response.ok) {
-                    const { data } = await response.json();
-                    this.items.unshift({
-                        ...data,
-                        tmpContent: content,
-                        open: false,
-                        isEditing: false,
-                        errors: [],
-                    });
-                    this.newContent = '';
-                    this.errors = [];
-                } else {
-                    if (response.status === 400) {
-                        const { errors } = await response.json();
+                    onStoreMessageError: (errors) => {
                         for (let k in errors) {
                             this.errors.push(...errors[k]);
                         }
-                    } else {
-                        alert('予期せぬエラーが発生しましtあ。');
-                    }
-                }
-
+                    },
+                });
             },
             cancelEdit(item) {
                 item.content = item.tmpContent;
@@ -146,41 +117,51 @@
                 item.errors = [];
             },
             async editItem(item) {
-                const response = await fetch(`/api/messages/${item.id}`, {
-                    method: 'put',
-                    headers: {
-                        'Content-Type': 'application/json; charset=utf-8',
+                await updateMessage({
+                    messageId: item.id,
+                    content: item.content,
+                    onUpdateMessage: (data) => {
+                        item.updated_at = data.updated_at;
+                        item.isEdited = true;
+                        item.isEditing = false;
+                        item.tmpContent = item.content;
+                        item.errors = [];
                     },
-                    body: JSON.stringify({ content: item.content }),
-                });
-                if (response.ok) {
-                    const { data } = await response.json();
-                    item.updated_at = data.updated_at;
-                    item.isEdited = true;
-                    item.isEditing = false;
-                    item.tmpContent = item.content;
-                    item.errors = [];
-                } else {
-                    if (response.status === 400) {
-                        const { errors } = await response.json();
+                    onUpdateMessageError: (errors) => {
                         for (let k in errors) {
                             item.errors.push(...errors[k]);
                         }
-                    } else {
-                        alert('予期せぬエラーが発生しましtあ。');
-                    }
-                }
+                    },
+                })
             },
             async deleteItem(messageId) {
-                const response = await fetch(`/api/messages/${messageId}`, {
-                    method: 'delete',
+                await destroyMessage({
+                    messageId,
+                    onDestroyMessage: () => {
+                        this.items = this.items.filter(item => item.id !== messageId);
+                    },
                 });
-                if (response.ok) {
-                    this.items = this.items.filter(item => item.id !== messageId);
-                } else {
-                    alert('削除に失敗しました。もう一度やり直してください。');
-                }
-            }
-        }
+            },
+            async likeItem(item) {
+                await storeLike({
+                    messageId: item.id,
+                    onStoreLike: () => {
+                        item.isLiked = true;
+                        item.likedCount++;
+                    },
+                    onStoreLikeError: () => {},
+                });
+            },
+            async unlikeItem(item) {
+                await destroyLike({
+                    messageId: item.id,
+                    onDestroyLike: () => {
+                        item.isLiked = false;
+                        item.likedCount--;
+                    },
+                    onDestroyLikeError: () => {},
+                });
+            },
+        };
     }
 </script>
