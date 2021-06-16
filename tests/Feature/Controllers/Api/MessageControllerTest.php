@@ -26,6 +26,56 @@ class MessageControllerTest extends TestCase
         $response->assertSuccessful();
     }
 
+    public function test_message_can_be_created()
+    {
+        $user = User::factory()->create();
+        $response = $this->actingAs($user)->post('/api/messages', [
+            'content' => 'test content',
+        ]);
+
+        // Messageが作成されたかどうか
+        $message = Message::first();
+        $this->assertEquals('test content', $message->content);
+
+        // レスポンスが正しいかどうか
+        $response->assertSuccessful();
+        $this->assertEquals(
+            MessageResource::make($message)->toJson(),
+            json_encode($response->json('data'))
+        );
+    }
+
+    public function test_message_can_not_be_created_if_content_empty()
+    {
+        $user = User::factory()->create();
+        $response = $this->actingAs($user)->post('/api/messages', [
+            'content' => '',
+        ]);
+
+        $response->assertStatus(400);
+        $response->assertJsonValidationErrors(['content' => 'メッセージは、必ず指定してください。']);
+    }
+
+    public function test_message_can_not_be_created_if_content_long()
+    {
+        $user = User::factory()->create();
+        $response = $this->actingAs($user)->post('/api/messages', [
+            'content' => $this->faker->realTextBetween(),
+        ]);
+
+        $response->assertStatus(400);
+        $response->assertJsonValidationErrors(['content' => 'メッセージは、140文字以下にしてください。']);
+    }
+
+    public function test_message_can_not_be_created_if_guest()
+    {
+        $response = $this->post('/api/messages', [
+            'content' => 'test content',
+        ]);
+
+        $response->assertStatus(302);
+    }
+
     public function test_message_can_be_updated()
     {
         $message = Message::factory()->create();
