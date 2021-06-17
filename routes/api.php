@@ -21,6 +21,15 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::get('/messages', [MessageController::class, 'index']);
+Route::post('/messages', [MessageController::class, 'store'])
+    ->middleware('auth')
+    ->name('api.messages.store');
+Route::put('/messages/{message}', [MessageController::class, 'update'])
+    ->middleware('can:update,message')
+    ->name('api.messages.update');
+Route::delete('/messages/{message}', [MessageController::class, 'destroy'])
+    ->middleware('can:destroy,message')
+    ->name('api.messages.destroy');
 
 Route::post('/likes', [LikeController::class, 'store'])
     ->middleware('auth')
