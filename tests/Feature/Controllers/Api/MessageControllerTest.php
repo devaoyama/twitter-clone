@@ -60,7 +60,7 @@ class MessageControllerTest extends TestCase
     {
         $user = User::factory()->create();
         $response = $this->actingAs($user)->post('/api/messages', [
-            'content' => $this->faker->realTextBetween(),
+            'content' => $this->faker->realTextBetween(141),
         ]);
 
         $response->assertStatus(400);
@@ -114,7 +114,7 @@ class MessageControllerTest extends TestCase
     {
         $message = Message::factory()->create();
         $response = $this->actingAs($message->user)->put('/api/messages/' . $message->id, [
-            'content' => $this->faker->realTextBetween(),
+            'content' => $this->faker->realTextBetween(141),
         ]);
 
         // Messageが更新されていないかどうか
