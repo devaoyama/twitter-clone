@@ -7,4 +7,6 @@ require('./requests/messages/storeMessage');
 require('./requests/messages/updateMessage');
 require('./requests/messages/destroyMessage');
 
+require('./states/messages');
+
 require('alpinejs');
