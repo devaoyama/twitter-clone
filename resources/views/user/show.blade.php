@@ -1,14 +1,8 @@
 <x-app-layout>
     <div class="relative min-h-screen bg-gray-100 dark:bg-gray-900 sm:pt-24 pb-10">
         <div class="max-w-6xl mx-auto sm:px-6 lg:px-8">
-            <div x-data="messages({})" x-init="init()">
-                <template x-if="user !== null">
-                    <div>
-                        <x-message-create-form />
-                        <hr>
-                    </div>
-                </template>
-
+            <div x-data="{ ...messages({ userId }), nickname: userNickname }" x-init="init()">
+                <h3 class="text-2xl" x-text="nickname"></h3>
                 <x-message-cards />
 
                 <div class="bg-white h-64 flex text-pink-600 items-center justify-center mx-3 my-5 rounded-lg shadow-md" id="infinite-scroll-trigger">
@@ -24,5 +18,7 @@
 </x-app-layout>
 
 <script>
-    const user = @json(Auth::user());
+    const user = @json(Auth::user()); // ログインしているユーザー
+    const userId = @json($user->id); // 現在表示されている画面のユーザーID
+    const userNickname = @json($user->nickname); // 現在表示されている画面のユーザーのニックネーム
 </script>
