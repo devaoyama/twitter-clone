@@ -3823,6 +3823,8 @@ __webpack_require__(/*! ./requests/messages/updateMessage */ "./resources/js/req
 
 __webpack_require__(/*! ./requests/messages/destroyMessage */ "./resources/js/requests/messages/destroyMessage.js");
 
+__webpack_require__(/*! ./states/messages */ "./resources/js/states/messages.js");
+
 __webpack_require__(/*! alpinejs */ "./node_modules/alpinejs/dist/alpine.js");
 
 /***/ }),
@@ -4303,6 +4305,285 @@ var updateMessage = /*#__PURE__*/function () {
 }();
 
 window.updateMessage = updateMessage;
+
+/***/ }),
+
+/***/ "./resources/js/states/messages.js":
+/*!*****************************************!*\
+  !*** ./resources/js/states/messages.js ***!
+  \*****************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) { symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+function messages(_ref) {
+  var userId = _ref.userId;
+  return {
+    triggerElement: null,
+    itemsPerPage: 10,
+    nextLink: '/api/messages',
+    observer: null,
+    isObserverPolyfilled: false,
+    items: [],
+    errors: [],
+    newContent: '',
+    init: function init(elementId) {
+      var ctx = this;
+      this.triggerElement = document.querySelector(elementId ? elementId : '#infinite-scroll-trigger');
+
+      if (!('IntersectionObserver' in window) || !('IntersectionObserverEntry' in window) || !('isIntersecting' in window.IntersectionObserverEntry.prototype) || !('intersectionRatio' in window.IntersectionObserverEntry.prototype)) {
+        this.isObserverPolyfilled = true;
+        window.alpineInfiniteScroll = {
+          scrollFunc: function scrollFunc() {
+            var position = ctx.triggerElement.getBoundingClientRect();
+
+            if (position.top < window.innerHeight && position.bottom >= 0) {
+              ctx.getItems();
+            }
+          }
+        };
+        window.addEventListener('scroll', window.alpineInfiniteScroll.scrollFunc);
+      } else {
+        this.observer = new IntersectionObserver(function (entries) {
+          if (entries[0].isIntersecting === true) {
+            ctx.getItems();
+          }
+        }, {
+          threshold: [0]
+        });
+        this.observer.observe(this.triggerElement);
+      }
+    },
+    getItems: function getItems() {
+      var _this = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
+        var link;
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                link = userId === undefined ? _this.nextLink : _this.nextLink + '?user_id=' + userId;
+                _context.next = 3;
+                return fetchMessage({
+                  link: link,
+                  onFetchMessage: function onFetchMessage(_ref2) {
+                    var data = _ref2.data,
+                        links = _ref2.links;
+                    _this.nextLink = links.next;
+                    _this.items = _this.items.concat(data.map(function (v) {
+                      return _objectSpread(_objectSpread({}, v), {}, {
+                        tmpContent: v.content,
+                        open: false,
+                        isEditing: false,
+                        errors: []
+                      });
+                    }));
+
+                    if (_this.nextLink === null) {
+                      if (_this.isObserverPolyfilled) {
+                        window.removeEventListener('scroll', window.alpineInfiniteScroll.scrollFunc);
+                      } else {
+                        _this.observer.unobserve(_this.triggerElement);
+                      }
+
+                      _this.triggerElement.parentNode.removeChild(_this.triggerElement);
+                    }
+                  }
+                });
+
+              case 3:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee);
+      }))();
+    },
+    createItem: function createItem(_ref3) {
+      var _this2 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee2() {
+        var content;
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                content = _ref3.content;
+                _context2.next = 3;
+                return storeMessage({
+                  content: content,
+                  onStoreMessage: function onStoreMessage(data) {
+                    _this2.items.unshift(_objectSpread(_objectSpread({}, data), {}, {
+                      tmpContent: content,
+                      open: false,
+                      isEditing: false,
+                      errors: []
+                    }));
+
+                    _this2.newContent = '';
+                    _this2.errors = [];
+                  },
+                  onStoreMessageError: function onStoreMessageError(errors) {
+                    for (var k in errors) {
+                      var _this2$errors;
+
+                      (_this2$errors = _this2.errors).push.apply(_this2$errors, _toConsumableArray(errors[k]));
+                    }
+                  }
+                });
+
+              case 3:
+              case "end":
+                return _context2.stop();
+            }
+          }
+        }, _callee2);
+      }))();
+    },
+    cancelEdit: function cancelEdit(item) {
+      item.content = item.tmpContent;
+      item.isEditing = false;
+      item.errors = [];
+    },
+    editItem: function editItem(item) {
+      return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee3() {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                _context3.next = 2;
+                return updateMessage({
+                  messageId: item.id,
+                  content: item.content,
+                  onUpdateMessage: function onUpdateMessage(data) {
+                    item.updated_at = data.updated_at;
+                    item.isEdited = true;
+                    item.isEditing = false;
+                    item.tmpContent = item.content;
+                    item.errors = [];
+                  },
+                  onUpdateMessageError: function onUpdateMessageError(errors) {
+                    for (var k in errors) {
+                      var _item$errors;
+
+                      (_item$errors = item.errors).push.apply(_item$errors, _toConsumableArray(errors[k]));
+                    }
+                  }
+                });
+
+              case 2:
+              case "end":
+                return _context3.stop();
+            }
+          }
+        }, _callee3);
+      }))();
+    },
+    deleteItem: function deleteItem(messageId) {
+      var _this3 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee4() {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee4$(_context4) {
+          while (1) {
+            switch (_context4.prev = _context4.next) {
+              case 0:
+                _context4.next = 2;
+                return destroyMessage({
+                  messageId: messageId,
+                  onDestroyMessage: function onDestroyMessage() {
+                    _this3.items = _this3.items.filter(function (item) {
+                      return item.id !== messageId;
+                    });
+                  }
+                });
+
+              case 2:
+              case "end":
+                return _context4.stop();
+            }
+          }
+        }, _callee4);
+      }))();
+    },
+    likeItem: function likeItem(item) {
+      return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee5() {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee5$(_context5) {
+          while (1) {
+            switch (_context5.prev = _context5.next) {
+              case 0:
+                _context5.next = 2;
+                return storeLike({
+                  messageId: item.id,
+                  onStoreLike: function onStoreLike() {
+                    item.isLiked = true;
+                    item.likedCount++;
+                  },
+                  onStoreLikeError: function onStoreLikeError() {}
+                });
+
+              case 2:
+              case "end":
+                return _context5.stop();
+            }
+          }
+        }, _callee5);
+      }))();
+    },
+    unlikeItem: function unlikeItem(item) {
+      return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee6() {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee6$(_context6) {
+          while (1) {
+            switch (_context6.prev = _context6.next) {
+              case 0:
+                _context6.next = 2;
+                return destroyLike({
+                  messageId: item.id,
+                  onDestroyLike: function onDestroyLike() {
+                    item.isLiked = false;
+                    item.likedCount--;
+                  },
+                  onDestroyLikeError: function onDestroyLikeError() {}
+                });
+
+              case 2:
+              case "end":
+                return _context6.stop();
+            }
+          }
+        }, _callee6);
+      }))();
+    }
+  };
+}
+
+window.messages = messages;
 
 /***/ }),
 
