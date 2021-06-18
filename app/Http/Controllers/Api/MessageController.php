@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\Message\IndexRequest;
 use App\Http\Requests\Api\Message\StoreRequest;
 use App\Http\Requests\Api\Message\UpdateRequest;
 use App\Http\Resources\MessageResource;
@@ -11,9 +12,12 @@ use Illuminate\Support\Facades\Auth;
 
 class MessageController extends Controller
 {
-    function index()
+    function index(IndexRequest $request)
     {
-        $messages = Message::orderBy('id', 'DESC')->with('user', 'likedUsers')->cursorPaginate(10);
+        $messages = Message::orderBy('id', 'DESC')
+            ->filter($request->validated())
+            ->with('user', 'likedUsers')
+            ->cursorPaginate(10);
 
         return MessageResource::collection($messages);
     }
