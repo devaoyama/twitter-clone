@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DefaultController;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -29,5 +30,8 @@ Route::post('/messages/{message}', [MessageController::class, 'update'])
 Route::delete('/messages/{message}', [MessageController::class, 'destroy'])
     ->middleware('can:destroy,message')
     ->name('messages.destroy');
+
+Route::get('/users/{user}', [UserController::class, 'show'])
+    ->name('users.show');
 
 require __DIR__ . '/auth.php';

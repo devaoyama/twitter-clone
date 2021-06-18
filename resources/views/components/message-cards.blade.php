@@ -10,7 +10,7 @@
                 </template>
             </div>
             <div class="text-gray-dark flex items-center">
-                <p  x-text="`${item.user.nickname}@${item.user.id}`"></p>
+                <a class="block" x-bind:href="`/users/${item.user.id}`" x-text="`${item.user.nickname}@${item.user.id}`"></a>
                 <template x-if="user?.id === item.user.id">
                     <div class="relative" @click.away="item.open = false" @close.stop="item.open = false">
                         <div @click="item.open = !item.open">

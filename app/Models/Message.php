@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -28,5 +29,13 @@ class Message extends Model
     public function isLiked(User $user): bool
     {
         return $this->likedUsers()->where('user_id', $user->id)->exists();
+    }
+
+    static public function scopeFilter(Builder $query, array $conditions): Builder
+    {
+        foreach ($conditions as $key => $condition) {
+            $query->where($key, $condition);
+        }
+        return $query;
     }
 }

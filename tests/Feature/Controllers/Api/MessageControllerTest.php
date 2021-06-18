@@ -26,6 +26,28 @@ class MessageControllerTest extends TestCase
         $response->assertSuccessful();
     }
 
+    public function test_messages_can_be_returned_when_filtering()
+    {
+        $messages = Message::factory(15)->create();
+        $userId = $messages->first()->user_id;
+        $response = $this->get('/api/messages?user_id=' . $userId);
+        $expectedMessages = Message::orderBy('id', 'DESC')->where('user_id', $userId)->with('user', 'likedUsers')->cursorPaginate(10);
+        $this->assertEquals(
+            MessageResource::collection($expectedMessages)->toJson(),
+            json_encode($response->json('data'))
+        );
+        $response->assertSuccessful();
+    }
+
+    public function test_messages_can_not_be_returned_when_bad_query()
+    {
+        Message::factory(15)->create();
+        $response = $this->get('/api/messages?user_id=' . 'a');
+
+        $response->assertStatus(400);
+        $response->assertJsonValidationErrors(['user_id' => 'user idには、整数を指定してください。']);
+    }
+
     public function test_message_can_be_created()
     {
         $user = User::factory()->create();
